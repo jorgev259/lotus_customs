@@ -1,5 +1,5 @@
 var util = require('../../utilities.js')
-const config = require('../../data/config.json')
+const config = require('../../data/config.js')
 
 module.exports = {
   events: {
