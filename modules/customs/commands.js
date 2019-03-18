@@ -90,7 +90,8 @@ module.exports = {
     },
 
     add: {
-      desc: 'Adds a new command to Akira. Usage: >add <type> <name> <link>',
+      desc: 'Adds a new command to Akira.',
+      usage: 'add <type> <name> <link>',
       async execute (client, message, param, db) {
         var name = param[2].toLowerCase()
         var type = param[1].toLowerCase()
@@ -140,7 +141,8 @@ module.exports = {
     },
 
     remove: {
-      desc: 'Deletes an embed command. Usage: >remove <name>',
+      usage: 'remove <name>',
+      desc: 'Deletes an embed command.',
       async execute (client, message, param, db) {
         var exCommand = db
           .prepare('SELECT command FROM customs WHERE guild=? AND name=?')
