@@ -1,6 +1,3 @@
-const Discord = require('discord.js')
-var util = require('../../utilities.js')
-
 module.exports = {
   async reqs (client, db) {
     db.prepare(
@@ -24,73 +21,8 @@ module.exports = {
       }
     },
 
-    simple: {
-      execute (client, message, param, db) {
-        let command = db
-          .prepare('SELECT command FROM customs WHERE guild=? AND name=?')
-          .get(message.guild.id, param[0].toLowerCase())
-        message.channel.send(command.command)
-      }
-    },
-
-    webhook: {
-      async execute (client, message, param, db) {
-        let command = db
-          .prepare('SELECT command FROM customs WHERE guild=? AND name=?')
-          .get(message.guild.id, param[0].toLowerCase())
-        let hooks = (await message.channel.fetchWebhooks()).filter(
-          h => h.name === 'simple'
-        )
-
-        let hook
-        if (hooks.size === 0) {
-          hook = await message.channel.createWebhook('simple', {
-            avatar: message.author.displayAvatarURL()
-          })
-        } else {
-          hook = hooks.first()
-          await hook.edit({ avatar: message.author.displayAvatarURL() })
-        }
-        message.delete()
-        hook
-          .sendSlackMessage({
-            username: message.member.displayName,
-            text: eval('`' + command.command + '`'), // eslint-disable-line
-          })
-          .catch(console.error)
-      }
-    },
-
-    embed: {
-      execute (client, message, param, db) {
-        let command = db
-          .prepare(
-            'SELECT content FROM embeds WHERE guild=? AND name=? ORDER BY RANDOM() LIMIT 1'
-          )
-          .get(message.guild.id, param[0].toLowerCase())
-
-        message.channel
-          .send(new Discord.MessageAttachment(command.content))
-          .catch(function (error) {
-            util.log(
-              client,
-              param[0] + ' failed with ' + error + '\n ' + command.content
-            )
-            if (error === 'Error: 403 Forbidden') {
-              util.log(
-                client,
-                'removed ' + command.content + ' from ' + param[0].toLowerCase()
-              )
-              db.prepare(
-                'DELETE FROM embeds WHERE guild=? AND name=? and content=?'
-              ).run(message.guild.id, param[0].toLowerCase(), command.content)
-            }
-          })
-      }
-    },
-
     add: {
-      desc: 'Adds a new command to Akira.',
+      desc: 'Adds a new custom command.',
       usage: 'add <type> <name> <link>',
       async execute (client, message, param, db) {
         var name = param[2].toLowerCase()
@@ -142,7 +74,7 @@ module.exports = {
 
     remove: {
       usage: 'remove <name>',
-      desc: 'Deletes an embed command.',
+      desc: 'Deletes a custom command.',
       async execute (client, message, param, db) {
         var exCommand = db
           .prepare('SELECT command FROM customs WHERE guild=? AND name=?')
