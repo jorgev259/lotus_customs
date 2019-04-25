@@ -22,7 +22,7 @@ module.exports = {
         if (!param[0]) return
         var command = db.prepare('SELECT * FROM customs WHERE guild=? AND name=?').get(message.guild.id, param[0].toLowerCase())
         if (!command) return
-
+        console.log(command)
         // if (await util.permCheck(message, moduleName, command.name, client, db)) {
         switch (command.type) {
           case 'simple':
