@@ -30,7 +30,7 @@ module.exports = {
 
         let command = db
           .prepare('SELECT type FROM customs WHERE guild=? AND name=?')
-          .get(message.guild.id, param[0].toLowerCase())
+          .get(message.guild.id, name)
 
         if (command !== undefined) {
           db.prepare(
