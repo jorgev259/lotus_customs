@@ -18,11 +18,11 @@ module.exports = {
         } else {
           param.splice(0, 1)
         }
-        console.log(param)
+
         if (!param[0]) return
         var command = db.prepare('SELECT * FROM customs WHERE guild=? AND name=?').get(message.guild.id, param[0].toLowerCase())
         if (!command) return
-        console.log(command)
+
         // if (await util.permCheck(message, moduleName, command.name, client, db)) {
         switch (command.type) {
           case 'simple':
@@ -54,20 +54,20 @@ module.exports = {
 
           case 'embed':
             message.channel
-              .send(new Discord.MessageAttachment(command.content))
+              .send(new Discord.MessageAttachment(command.command))
               .catch(function (error) {
                 util.log(
                   client,
-                  param[0] + ' failed with ' + error + '\n ' + command.content
+                  param[0] + ' failed with ' + error + '\n ' + command.command
                 )
                 if (error === 'Error: 403 Forbidden') {
                   util.log(
                     client,
-                    'removed ' + command.content + ' from ' + param[0].toLowerCase()
+                    'removed ' + command.command + ' from ' + param[0].toLowerCase()
                   )
                   db.prepare(
-                    'DELETE FROM embeds WHERE guild=? AND name=? and content=?'
-                  ).run(message.guild.id, param[0].toLowerCase(), command.content)
+                    'DELETE FROM customs WHERE WHERE guild=? AND name=?'
+                  ).run(message.guild.id, param[0].toLowerCase())
                 }
               })
             break

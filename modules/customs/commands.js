@@ -3,9 +3,6 @@ module.exports = {
     db.prepare(
       'CREATE TABLE IF NOT EXISTS customs (guild TEXT, name TEXT, type TEXT, command TEXT, PRIMARY KEY(`guild`,`name`))'
     ).run()
-    db.prepare(
-      'CREATE TABLE IF NOT EXISTS embeds (guild TEXT, name TEXT, content TEXT)'
-    ).run()
   },
 
   commands: {
@@ -23,52 +20,32 @@ module.exports = {
 
     add: {
       desc: 'Adds a new custom command.',
-      usage: 'add <type> <name> <link>',
+      usage: 'add [simple/webhook/embed] <name> <link>',
       async execute (client, message, param, db) {
         var name = param[2].toLowerCase()
         var type = param[1].toLowerCase()
+
+        if (!['simple', 'webhook', 'embed'].includes(type)) return message.channel.send('Invalid type')
         param = param.slice(3)
 
         let command = db
           .prepare('SELECT type FROM customs WHERE guild=? AND name=?')
           .get(message.guild.id, param[0].toLowerCase())
-        db.prepare('BEGIN TRANSACTION').run()
-        if (command !== undefined && type === 'embed') {
-          db.prepare(
-            'INSERT INTO embeds (guild, name, content) VALUES (?,?,?)'
-          ).run(message.guild.id, name, param.join(' '))
-          message.reply('Command udpated')
-        } else if (command === undefined) {
-          let content
-          if (type === 'embed') {
-            content = ''
-            db.prepare(
-              'INSERT INTO embeds (guild, name, content) VALUES (?,?,?)'
-            ).run(
-              message.guild.id,
-              name,
-              param
-                .join(' ')
-                .split('\\n')
-                .join('\n')
-            )
-          } else {
-            content = param
-              .join(' ')
-              .split('\\n')
-              .join('\n')
-          }
 
+        if (command !== undefined) {
           db.prepare(
             'INSERT INTO customs (guild, name, type, command) VALUES (?,?,?,?)'
-          ).run(message.guild.id, name, type, content)
+          ).run(message.guild.id, name, type,
+            param
+              .join(' ')
+              .split('\\n')
+              .join('\n'))
           message.reply('Command added')
         } else {
           return message.reply(
             'That command already exists, choose another name'
           )
         }
-        db.prepare('COMMIT').run()
       }
     },
 
@@ -80,16 +57,11 @@ module.exports = {
           .prepare('SELECT command FROM customs WHERE guild=? AND name=?')
           .get(message.guild.id, param[1].toLowerCase())
         if (exCommand !== undefined) {
-          db.prepare('BEGIN TRANSACTION').run()
           db.prepare('DELETE FROM customs WHERE guild=? AND name=?').run(
             message.guild.id,
             param[1].toLowerCase()
           )
-          db.prepare('DELETE FROM embeds WHERE guild=? AND name=?').run(
-            message.guild.id,
-            param[1].toLowerCase()
-          )
-          db.prepare('COMMIT').run()
+
           message.reply('Command removed')
         } else {
           message.reply('Command doesnt exist')
