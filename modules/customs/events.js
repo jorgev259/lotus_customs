@@ -18,7 +18,8 @@ module.exports = {
         } else {
           param.splice(0, 1)
         }
-
+        console.log(param)
+        if (!param[0]) return
         var command = db.prepare('SELECT * FROM customs WHERE guild=? AND name=?').get(message.guild.id, param[0].toLowerCase())
         if (!command) return
 
