@@ -31,8 +31,8 @@ module.exports = {
         let command = db
           .prepare('SELECT type FROM customs WHERE guild=? AND name=?')
           .get(message.guild.id, name)
-
-        if (command !== undefined) {
+        console.log(command)
+        if (!command) {
           db.prepare(
             'INSERT INTO customs (guild, name, type, command) VALUES (?,?,?,?)'
           ).run(message.guild.id, name, type,
