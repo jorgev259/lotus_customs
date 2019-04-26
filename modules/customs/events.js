@@ -20,8 +20,10 @@ module.exports = {
         }
 
         if (!param[0]) return
-        var command = db.prepare('SELECT * FROM customs WHERE guild=? AND name=?').get(message.guild.id, param[0].toLowerCase())
-        if (!command) return
+        var command = db.prepare('SELECT * FROM customs WHERE guild=? AND name=?').all(message.guild.id, param[0].toLowerCase())
+
+        if (command.length > 0) command = command[Math.floor(Math.random() * command.length)]
+        else return
 
         // if (await util.permCheck(message, moduleName, command.name, client, db)) {
         switch (command.type) {
