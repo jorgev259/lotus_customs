@@ -1,20 +1,5 @@
 module.exports = {
   async reqs (client, db) {
-    db.prepare(`
-      PRAGMA foreign_keys=off;`).run()
-
-    db.prepare(`BEGIN TRANSACTION;`).run()
-
-    db.prepare(`ALTER TABLE customs RENAME TO old_table;`).run()
-
-    db.prepare(`CREATE TABLE IF NOT EXISTS customs (guild TEXT, name TEXT, type TEXT, command TEXT)`).run()
-
-    db.prepare(`INSERT INTO customs SELECT * FROM old_table;`).run()
-
-    db.prepare(`COMMIT;`).run()
-
-    db.prepare(`PRAGMA foreign_keys=on;`).run()
-
     db.prepare(
       'CREATE TABLE IF NOT EXISTS customs (guild TEXT, name TEXT, type TEXT, command TEXT)'
     ).run()
