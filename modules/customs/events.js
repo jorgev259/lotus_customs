@@ -25,7 +25,7 @@ module.exports = {
         if (command.length > 0) command = command[Math.floor(Math.random() * command.length)]
         else return
 
-        if (await util.permCheck(message, moduleName, command.name, client, db)) {
+        if (await util.permCheck(message, false, command.name, client, db)) {
           switch (command.type) {
             case 'simple':
               message.channel.send(command.command)
